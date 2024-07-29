@@ -25,7 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install --filter docs
+          pnpm install
           pnpm build --filter docs
 
           git config user.name "github-actions[bot]"
