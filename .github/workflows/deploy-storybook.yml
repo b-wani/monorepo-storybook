@@ -23,7 +23,7 @@ jobs:
       # Set up Node
       - uses: pnpm/action-setup@v4
 
-      - name: Install dependencies
+      - name: Install dependencies2
         run: |
           pnpm install
           pnpm build --filter docs
