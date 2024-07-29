@@ -1,46 +1,38 @@
-name: Deploy to GitHub Pages
+# .github/workflows/deploy-github-pages.yaml
+
+# Workflow name
+name: Build and Publish Storybook to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main # Change this to your default branch if it's not main
+  workflow_dispatch:
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# List of jobs
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-
+    # Job steps
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      # Manual Checkout
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14' # Change this to the Node.js version you're using
+      # Set up Node
+      - uses: pnpm/action-setup@v4
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Build the project
-        run: npm run build # Adjust this command to your project's build command
-
-      - name: Deploy to GitHub Pages
         run: |
-          # Move to the build output directory
-          cd build  # Adjust this to your build output directory
+          pnpm install --filter docs
+          pnpm build --filter docs
 
-          # Initialize a new git repository
-          git init
-
-          # Set up GitHub user
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Add all files
           git add .
 
-          # Commit the files
           git commit -m "Deploy to GitHub Pages"
 
-          # Force push to the gh-pages branch
           git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" master:gh-pages
