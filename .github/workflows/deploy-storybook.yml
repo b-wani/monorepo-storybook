@@ -23,13 +23,19 @@ jobs:
       # Set up Node
       - uses: pnpm/action-setup@v4
 
-      - name: Install dependencies2
+      - name: Install dependencies
         run: |
           pnpm install
           pnpm build --filter docs
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git show-ref --verify --quiet refs/heads/gh-pages; then
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+          fi          
 
           find . -mindepth 1 -maxdepth 1 ! -name 'docs' ! -name '.git' -exec rm -rf {} +
 
