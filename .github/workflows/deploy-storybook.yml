@@ -1,32 +1,46 @@
-# .github/workflows/deploy-github-pages.yaml
-
-# Workflow name
-name: Build and Publish Storybook to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main # Change this to your default branch if it's not main
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# List of jobs
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    # Job steps
+
     steps:
-      # Manual Checkout
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      # Set up Node
-      - uses: pnpm/action-setup@v4
-
-      #👇 Add Storybook build and deploy to GitHub Pages as a step in the workflow
-      - uses: bitovi/github-actions-storybook-to-github-pages@v1.0.3
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          install_command: pnpm install --filter docs # default: npm ci
-          build_command: pnpm build # default: npm run build-storybook
-          path: apps/docs/storybook-static # default: dist/storybook
-          checkout: false # default: true
+          node-version: '14' # Change this to the Node.js version you're using
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build # Adjust this command to your project's build command
+
+      - name: Deploy to GitHub Pages
+        run: |
+          # Move to the build output directory
+          cd build  # Adjust this to your build output directory
+
+          # Initialize a new git repository
+          git init
+
+          # Set up GitHub user
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add all files
+          git add .
+
+          # Commit the files
+          git commit -m "Deploy to GitHub Pages"
+
+          # Force push to the gh-pages branch
+          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" master:gh-pages
