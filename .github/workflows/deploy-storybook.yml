@@ -31,10 +31,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          find . -mindepth 1 -maxdepth 1 ! -name 'docs' ! -name '.git' -exec rm -rf {} +
+
+          mv docs/* .
+
+          rmdir docs
+
           git add .
 
           git commit -m "Deploy to GitHub Pages"
-
-          git checkout -b gh-pages
 
           git push -u --force origin gh-pages
